@@ -1,7 +1,7 @@
 # BUG REPORT
 
 ## Bug 1 — Crash on Member Card When No Team Assigned
-
+![alt text](image.png)
 **File:** `src/utils/helpers.ts` — `getTeamDisplay()`
 
 **Symptom:**
