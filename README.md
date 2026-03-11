@@ -61,6 +61,7 @@ For the Search Comments feature, I built it as a self-contained overlay (`Search
 
 6. **Error boundaries.** A React error boundary wrapping each major section (grid, feed, modal) would prevent a crash in one component from taking down the entire app.
 
+7. **Better UI handling** You have to tap again in notification icon to close it off same like for the header search by creating ref container
 ---
 
 ## Bugs Fixed
