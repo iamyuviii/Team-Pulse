@@ -1,10 +1,8 @@
 # FEATURE NOTES — Search Comments
 
 ## How I Approached It
-
+All 500 comments are fetched from `jsonplaceholder.typicode.com/comments` once on mount and stored in state. Every search after that is just a `.filter()` over that local array — no repeated network calls, no latency while typing. The fetch itself is wrapped with an `AbortController` so if the user navigates away mid-request, it cancels cleanly.
 ### Fetch Once, Search Locally
-
-Rather than hitting the API on every keystroke, I fetch all 500 comments a single time when the hook mounts and hold them in state. After that, every search is just a `filter()` over the local array — instant and no network dependency during typing.
 
 The fetch uses an `AbortController` so if the component unmounts before the response comes back (say the user navigates away), we don't end up with a state update on an unmounted component.
 
