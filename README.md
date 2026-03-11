@@ -31,7 +31,7 @@ For the Search Comments feature, I built it as a self-contained overlay (`Search
 
 2. **Manual virtualisation for search results.** The `SearchOverlay` renders only the visible window of results (`ITEM_HEIGHT × index` positioning with an overscan buffer of 5). This keeps DOM size constant regardless of result count — implemented without any external library per the constraints.
 
-3. **Immutability discipline across bug fixes.** Several bugs (Bugs 4, 11, 18) stemmed from direct mutation — `push()` on shared arrays, direct property assignment on state objects. Every fix uses immutable patterns (spread operator, new object/array creation) so React correctly detects changes.
+3. **Immutability discipline across bug fixes.** Several bugs (Bugs 4, 11) stemmed from direct mutation — `push()` on shared arrays, direct property assignment on state objects. Every fix uses immutable patterns (spread operator, new object/array creation) so React correctly detects changes.
 
 4. **Stale-closure and lifecycle fixes.** The timer (Bug 13) used a functional `setState` updater to avoid a stale closure. Fetch effects (Bugs 16–17) received `cancelled` flags in their cleanup functions. The debounced search uses a `searchIdRef` counter to discard out-of-order results.
 
@@ -66,4 +66,4 @@ For the Search Comments feature, I built it as a self-contained overlay (`Search
 
 ## Bugs Fixed
 
-18 bugs found and fixed — see `BUG_REPORT.md` for full details with root causes, reproduction steps, and explanations.
+17 bugs found and fixed — see `BUG_REPORT.md` for full details with root causes, reproduction steps, and explanations.
