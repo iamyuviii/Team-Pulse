@@ -233,8 +233,6 @@ An inline `style` attribute on the grid container (`style={{ gridTemplateColumns
 **Fix:**
 Removed the inline `gridTemplateColumns` style so the CSS media queries can take effect and properly control the column count at each breakpoint.
 
-**Connected to:** Bug 9 (Grid jitter). Both bugs involve the MemberGrid layout — the inline style also interfered with the memoization fix for Bug 9, since changing `columns` caused unnecessary re-renders.
-
 ---
 
 
@@ -253,7 +251,6 @@ The `useEffect` added a `resize` event listener but never returned a cleanup fun
 **Fix:**
 Removed the `useEffect` resize handler, the `gridCols` state, and the unused `columns` prop from `MemberGrid`. The responsive column layout is fully controlled by the existing CSS media queries.
 
-**Connected to:** Bug 14 (Inline grid style). Both involved redundant column-count logic that conflicted with the CSS-based responsive layout.
 
 ---
 
@@ -287,29 +284,9 @@ The `useEffect` hooks that fetched data did not return cleanup functions. When t
 **Fix:**
 Added a `cancelled` flag in each fetch `useEffect`. The cleanup function sets `cancelled = true`, and the `.then()` / `.catch()` callbacks check this flag before calling any state setters — if cancelled, they silently discard the result.
 
-**Connected to:** Bug 16 (No error handling). Both fixes were applied together since they address the same fetch lifecycle gaps.
-
 ---
 
-## Bug 18 — Adding a Tag to One Member Could Leak to Others (Shallow Copy Mutation)
 
-**File:** `src/components/MemberModal/MemberModal.tsx` — `handleAddTag()`
-
-**Symptom:**
-Adding a tag to a member in the modal could, under certain conditions, cause that tag to appear on the member's card in the grid even after closing and reopening — or leak into the original member object shared across components.
-
-**Root Cause:**
-The `handleAddTag` function used a shallow spread (`{ ...selectedMember }`) to "clone" the member, but `tags` is an array, so `updated.tags` was still the **same reference** as the original member's `tags` array. Calling `.push()` on it mutated the original array in-place, bypassing React's state management. Any other component holding a reference to that member object would silently see the mutation.
-
-**Fix:**
-Replaced the shallow copy + `.push()` with a proper immutable update:
-```js
-const updated = { ...selectedMember, tags: [...selectedMember.tags, newTag.trim()] };
-```
-This creates a new `tags` array, leaving the original untouched.
-
-
----
 
 ## UI Enhancement — Hamburger Menu for Mobile Sidebar
 
