@@ -1,7 +1,8 @@
 # BUG REPORT
 
 ## Bug 1 — Crash on Member Card When No Team Assigned
-![alt text](image.png)
+![src/image/image.png](src/image/image.png)
+
 **File:** `src/utils/helpers.ts` — `getTeamDisplay()`
 
 **Symptom:**
@@ -13,11 +14,10 @@ The code was trying to access `member.team.name` without first checking whether 
 **Fix:**
 Added a guard that checks `typeof member.team === 'object'`, `member.team !== null`, and `'name' in member.team` before accessing `.name`. If any condition fails, the function returns `'Unassigned'`.
 
-**Connected to:** None directly, though it shares the helpers module with Bug 2.
-
 ---
 
 ## Bug 2 — Notification Click Always Selected the Wrong Item
+![alt text](src/image/image2.png)
 
 **File:** `src/utils/helpers.ts` — `bindNotificationHandlers()`
 
@@ -30,7 +30,6 @@ The loop variable `i` was declared with `var`, which is function-scoped. By the 
 **Fix:**
 Changed `var` to `let` for the loop variable. `let` is block-scoped, so each iteration captures its own value of `i`, and handlers reference the correct notification.
 
-**Connected to:** None.
 
 ---
 
@@ -52,6 +51,7 @@ Replaced `forEach` + `setTimeout` with `Promise.allSettled` and `.map`. This wai
 ---
 
 ## Bug 4 — Duplicate Activities in the Activity Feed
+![alt text](src/image/image3.png)
 
 **File:** `src/components/ActivityFeed/ActivityFeed.tsx` — `useEffect` for fetching
 
@@ -69,6 +69,7 @@ Clear the existing activities before setting the new ones — use a fresh set ra
 ---
 
 ## Bug 5 — Activity Notes Mixed Up When Sorting or Filtering
+![alt text](src/image/image4.1.png) ![alt text](src/image/image4.2.png)
 
 **File:** `src/components/ActivityFeed/ActivityFeed.tsx` — list rendering
 
@@ -81,12 +82,11 @@ The list `key` used during rendering was not unique (e.g. array index). React re
 **Fix:**
 Changed the `key` to `activity.id`, which is unique per activity. Also added a loading state to prevent rendering stale data during fetches.
 
-**Connected to:** Bug 4 (Duplicate activities). When duplicates existed, even index-based keys couldn't disambiguate, making both bugs compound each other.
 
 ---
 
 ## Bug 6 — Console Warning from Search Query State
-
+![alt text](src/image/image5.png)
 **File:** `src/components/Header/Header.tsx` — `useState` for query
 
 **Symptom:**
@@ -98,7 +98,6 @@ The query state was being set to `undefined` (an uncontrolled value), which Reac
 **Fix:**
 Initialized the state with an empty string (`''`) to keep the input permanently controlled.
 
-**Connected to:** Bug 7 (Stale search results). Both bugs are in the Header's search flow — an undefined query state could also contribute to unexpected filtering behavior.
 
 ---
 
@@ -115,11 +114,12 @@ There was no cancellation mechanism for the debounced search. When the user type
 **Fix:**
 The cleanup function now clears the pending `setTimeout` and sets a `cancelled` flag. When a stale callback fires, it checks the flag and discards itself, so only the latest search ever writes results.
 
-**Connected to:** Bug 6 (Console warning). Both affect the same Header search pipeline.
 
 ---
 
 ## Bug 8 — Infinite Re-render Loop from Greeting State
+![alt text](src/image/image6.png)
+
 
 **File:** `src/components/Header/Header.tsx` — greeting computation
 
@@ -132,7 +132,6 @@ The page re-rendered infinitely, freezing the UI.
 **Fix:**
 Removed the greeting from React state. It is now computed once as a plain variable (or memoized constant), breaking the render ➝ effect ➝ setState ➝ render cycle.
 
-**Connected to:** Bug 9 (MemberGrid jitter). An infinite re-render loop in the Header causes the entire app to re-render non-stop, which directly worsens the jitter seen in MemberGrid.
 
 ---
 
@@ -148,8 +147,6 @@ The `members` array was being recreated as a new reference on every render. Beca
 
 **Fix:**
 Memoized the members array (e.g. with `useMemo`) so it only changes when the underlying data or filters actually change, preventing unnecessary effect re-runs.
-
-**Connected to:** Bug 11 (FilterContext state mutation). If filter state mutations didn't produce new references, React might batch-skip updates and then suddenly catch up, amplifying the visual jitter. Fixing both together stabilizes the filter ➝ grid pipeline.
 
 ---
 
@@ -171,6 +168,7 @@ Changed the count to derive from `displayMembers` (the filtered array) so it ref
 ---
 
 ## Bug 11 — Filter Radio Buttons Not Updating the UI
+![alt text](src/image/image7.png)
 
 **File:** `src/context/FilterContext.tsx` — `updateFilter()`
 
@@ -205,6 +203,7 @@ Added a small delay (e.g. `requestAnimationFrame` or `setTimeout(…, 0)`) befor
 ---
 
 ## Bug 13 — Standup Timer Seconds Not Counting Down
+![alt text](src/image/image8.png)
 
 **File:** `src/components/Timer/StandupTimer.tsx` — `setInterval` callback
 
@@ -309,31 +308,14 @@ const updated = { ...selectedMember, tags: [...selectedMember.tags, newTag.trim(
 ```
 This creates a new `tags` array, leaving the original untouched.
 
-**Connected to:** None directly. This is a standalone immutability violation in the modal.
-
-
-## Connection Summary
-
-| Bug | Directly Connected To | Relationship |
-|-----|----------------------|--------------|
-| 3 (Batch toast timing) | 12 (Toast animation) | Early toast + missing animation compound into invisible feedback |
-| 4 (Duplicate activities) | 5 (Activity key) | Duplicate data + non-unique keys make both worse |
-| 5 (Activity key) | 4 (Duplicate activities) | Same as above, bidirectional |
-| 6 (Console warning) | 7 (Stale results) | Both in Header search pipeline |
-| 7 (Stale results) | 6 (Console warning) | Same pipeline |
-| 8 (Infinite re-render) | 9 (Grid jitter) | Infinite renders cause downstream jitter |
-| 9 (Grid jitter) | 11 (Filter mutation), 14 (Inline grid style) | Filter mutation prevents proper memoization; inline style overrides responsive CSS |
-| 10 (Bookmark count) | 11 (Filter mutation) | Stale filters → stale filtered array → wrong count |
-| 11 (Filter mutation) | 9, 10 | Upstream cause for grid jitter and bookmark count |
-| 14 (Inline grid style) | 9 (Grid jitter) | Both affect MemberGrid layout behavior |
-| 15 (Resize handler leak) | 14 (Inline grid style) | Both involve dead responsive-column logic in Dashboard |
-| 16 (No fetch error handling) | 17 (No fetch abort on unmount) | Both are missing fetch lifecycle safeguards |
-| 18 (Tag mutation) | None | Standalone shallow-copy bug in MemberModal |
 
 ---
 
 ## UI Enhancement — Hamburger Menu for Mobile Sidebar
 
 A hamburger (☰) menu button was added to the Header, visible only on mobile (≤768px). Tapping it slides the sidebar in as an overlay with a close (✕) button and a backdrop. This replaces the always-visible desktop sidebar on narrow screens for a better mobile experience.
+
+![alt text](src/image/image9.1.png) ![alt text](src/image/image9.png)
+
 
 ---
