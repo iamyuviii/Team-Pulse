@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StatsCards } from '../components/StatsCards/StatsCards';
 import { MemberGrid } from '../components/MemberGrid/MemberGrid';
 import { StandupTimer } from '../components/Timer/StandupTimer';
@@ -8,14 +8,6 @@ import './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [gridCols, setGridCols] = useState(3);
-
-  useEffect(() => {
-    window.addEventListener('resize', () => {
-      console.log('resize handler fired');
-      setGridCols(window.innerWidth < 768 ? 1 : window.innerWidth < 1024 ? 2 : 3);
-    });
-  }, []);
 
   return (
     <div className="dashboard">
@@ -27,7 +19,7 @@ export const Dashboard: React.FC = () => {
         <StatsCards />
         <StandupTimer />
       </div>
-      <MemberGrid onSelectMember={setSelectedMember} columns={gridCols} />
+      <MemberGrid onSelectMember={setSelectedMember} />
       {selectedMember && (
         <MemberModal
           member={selectedMember}

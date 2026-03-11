@@ -4,9 +4,23 @@
   gap: 16px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .stats-cards {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-cards__card {
+    padding: 16px 18px;
+  }
+
+  .stats-cards__value {
+    font-size: 1.625rem;
   }
 }
 

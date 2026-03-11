@@ -29,7 +29,15 @@ export const StatsCards: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
 
   useEffect(() => {
-    fetchMembers().then(setMembers);
+    let cancelled = false;
+    fetchMembers()
+      .then(data => {
+        if (!cancelled) setMembers(data);
+      })
+      .catch(() => {
+        // Stats will show 0 if fetch fails
+      });
+    return () => { cancelled = true; };
   }, []);
 
   const total = useAnimatedCounter(members.length);

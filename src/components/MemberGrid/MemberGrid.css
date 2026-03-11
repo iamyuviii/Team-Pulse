@@ -27,8 +27,26 @@
 
 .member-grid__cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+}
+@media (max-width: 640px) {
+  .member-grid__cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .member-grid__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .member-grid__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }
 
 .member-grid__loading,

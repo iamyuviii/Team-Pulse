@@ -12,6 +12,7 @@
 }
 
 .header__left {
+  display: flex;
   flex: 0 0 auto;
 }
 
@@ -167,4 +168,80 @@
   user-select: none;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+/* ── Hamburger menu button ── */
+.header__menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 6px);
+  transition: background 0.12s;
+}
+
+.header__menu-btn:hover {
+  background: var(--bg);
+}
+
+.header__menu-icon {
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--text);
+  border-radius: 1px;
+  position: relative;
+}
+
+.header__menu-icon::before,
+.header__menu-icon::after {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 1px;
+  position: absolute;
+  left: 0;
+}
+
+.header__menu-icon::before {
+  top: -6px;
+}
+
+.header__menu-icon::after {
+  top: 6px;
+}
+
+@media (max-width: 768px) {
+  .header__menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+  }
+
+  .header__center {
+    padding: 0 12px;
+    max-width: 280px;
+  }
+
+  .header__greeting {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 12px;
+  }
+
+  .header__center {
+    display: none;
+  }
+
+  .header__logo {
+    font-size: 1.1rem;
+  }
 }

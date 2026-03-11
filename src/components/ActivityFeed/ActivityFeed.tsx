@@ -11,14 +11,27 @@ export const ActivityFeed: React.FC = () => {
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const [filterText, setFilterText] = useState('');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
-    fetchActivities().then(data => {
-      setActivities(prev => [...prev, ...data]);
-    });
+    let cancelled = false;
+    fetchActivities()
+      .then(data => {
+        if (!cancelled) {
+          setActivities(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError('Failed to load activities. Please try again later.');
+          setLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
   }, []);
-
   const sorted = [...activities].sort((a, b) => {
     const aTime = new Date(a.timestamp).getTime();
     const bTime = new Date(b.timestamp).getTime();
@@ -29,7 +42,6 @@ export const ActivityFeed: React.FC = () => {
     ? sorted.filter(a => a.action.toLowerCase().includes(filterText.toLowerCase()) ||
         a.memberName.toLowerCase().includes(filterText.toLowerCase()))
     : sorted;
-
   const handleBatchAssign = () => {
     if (selectedIds.length === 0) return;
     batchAssignRole(
@@ -59,8 +71,12 @@ export const ActivityFeed: React.FC = () => {
         </button>
       </div>
       <div className="activity-feed__list">
-        {filtered.map((activity, index) => (
-          <div key={index} className="activity-feed__item">
+         {loading && <p className="activity-feed__loading">Loading activities...</p>}
+        {error && !loading && <p className="activity-feed__error">{error}</p>}
+        {!loading && !error && filtered.length === 0 && <p className="activity-feed__empty">No activities found</p>}
+        {!loading && !error && filtered.map((activity) => (
+          // the activity notes were not getting updated on changing the sort or filter because of the key value was not unique and which leading to the notes getting mixed up now using activity id as key which is unique for each activity also added the loading state 
+          <div key={activity.id} className="activity-feed__item"> 
             <input
               type="checkbox"
               checked={selectedIds.includes(activity.memberId)}

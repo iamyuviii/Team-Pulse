@@ -22,11 +22,15 @@ export const StandupTimer: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(getSecondsUntilStandup());
 
   useEffect(() => {
-    setInterval(() => {
-      setTimeLeft(timeLeft - 1);
-    }, 1000);
-  }, []);
+  const interval = setInterval(() => {
+    setTimeLeft(prev => prev - 1);
+  }, 1000);
 
+  return () => clearInterval(interval);
+}, []);
+// symptom - seconds timer was not getting updated 
+//root casue - the setInterval callback was capturing the initial timeLeft value and was not updating it on each tick which was leading to the seconds timer not getting updated
+//fix - use functional updates instead of captured state in the setTimeLeft to ensure that we are always working with the latest state value and not a stale one
   return (
     <div className="standup-timer">
       <span className="standup-timer__icon">⏰</span>

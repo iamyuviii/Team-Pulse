@@ -14,6 +14,7 @@ type Page = 'dashboard' | 'activity';
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -23,19 +24,23 @@ const App: React.FC = () => {
       }
     };
     document.addEventListener('keydown', handleKey);
-  }, [currentPage]);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, []);
 
   return (
     <ThemeProvider>
       <FilterProvider>
         <ToastProvider>
           <div className="app-layout">
-            <Header onNavigate={(page) => setCurrentPage(page as Page)} />x
+            <Header onNavigate={(page) => setCurrentPage(page as Page)} onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
             <div className="app-body">
+              {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
               <Sidebar
                 currentPage={currentPage}
-                onNavigate={setCurrentPage}
-                onOpenSearch={() => setSearchOpen(true)}
+                onNavigate={(page) => { setCurrentPage(page); setSidebarOpen(false); }}
+                onOpenSearch={() => { setSearchOpen(true); setSidebarOpen(false); }}
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
               />
               <main className="main-content">
                 <div className="dashboard-content">

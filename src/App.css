@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: space-between;
   height: 60px;
-  padding: 0 24px;
+  padding: 0 20px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   transform: translateZ(0); /* GPU acceleration */
@@ -57,8 +57,36 @@
   padding: 12px 0;
 }
 
+/* ── Mobile sidebar backdrop ── */
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .main-content {
-    padding: 16px;
+    padding: 16px 12px;
+  }
+
+  .dashboard-content {
+    gap: 20px;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 149;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 12px 8px;
+  }
+
+  .dashboard-content {
+    gap: 16px;
   }
 }

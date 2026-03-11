@@ -12,7 +12,8 @@
 
 .member-modal__content {
   position: relative;
-  width: 600px;
+width: 100%;
+max-width: 600px;
   overflow-y: auto;
   max-height: 85vh;
   background: var(--surface);

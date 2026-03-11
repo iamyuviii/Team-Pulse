@@ -6,6 +6,8 @@ interface SidebarProps {
   currentPage: string;
   onNavigate: (page: 'dashboard' | 'activity') => void;
   onOpenSearch?: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const statuses = [
@@ -26,12 +28,18 @@ const roles = [
   { value: 'DevOps Engineer', label: 'DevOps Engineer' },
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, onOpenSearch }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, onOpenSearch, isOpen, onClose }) => {
   const { filters, updateFilter } = useFilters();
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
+      
       <nav className="sidebar__nav">
+        {onClose && (
+        <button className="sidebar__close" onClick={onClose} aria-label="Close menu">
+          ✕
+        </button>
+      )}
         <button
           className={`sidebar__nav-item ${currentPage === 'dashboard' ? 'sidebar__nav-item--active' : ''}`}
           onClick={() => onNavigate('dashboard')}
